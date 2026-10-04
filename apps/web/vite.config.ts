@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises'
+import { cp, readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
@@ -39,6 +39,57 @@ function brandFontLicense(): Plugin {
         fileName: 'assets/fonts/Montserrat-OFL.txt',
         source: await readFile(src('../../packages/client/ui-theme/src/styles/Montserrat-OFL.txt')),
       })
+    },
+  }
+}
+
+/** Client build profile whose document carries the Harnessie install metadata. */
+const HARNESSIE_PROFILE = 'harnessie'
+
+/** Harnessie install metadata replacing the default favicon pair. */
+const HARNESSIE_HEAD = [
+  '<link rel="icon" type="image/png" sizes="32x32" href="./harnessie/icons/favicon-32.png" />',
+  '<link rel="icon" type="image/png" sizes="64x64" href="./harnessie/icons/favicon-64.png" />',
+  '<link rel="apple-touch-icon" href="./harnessie/icons/apple-touch-icon.png" />',
+  '<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />',
+  '<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#151517" />',
+  '<meta name="mobile-web-app-capable" content="yes" />',
+  '<meta name="apple-mobile-web-app-capable" content="yes" />',
+  '<script>if (\'serviceWorker\' in navigator) addEventListener(\'load\', () => { void navigator.serviceWorker.register(\'./sw.js\') })</script>',
+].join('\n    ')
+
+/**
+ * In a `harnessie` client build, swap the favicon pair for the Harnessie icon
+ * links and service-worker registration, then copy `brand/harnessie` over the
+ * output: the manifest replaces the default one, the worker lands at the
+ * output root so its scope covers the application, and the icons stay under
+ * `harnessie/`. Other profiles leave the document and output untouched.
+ * @returns the profile-gated Vite plugin.
+ */
+function harnessieDocument(): Plugin {
+  const enabled = process.env.DSH_CLIENT_BUILD_PROFILE === HARNESSIE_PROFILE
+  const brand = src('./brand/harnessie')
+  let outputDirectory = ''
+  return {
+    name: 'dsh-harnessie-document',
+    configResolved(config) {
+      outputDirectory = resolve(config.root, config.build.outDir)
+    },
+    transformIndexHtml: {
+      // After Vite's asset pass, so the injected output-relative URLs stay verbatim.
+      order: 'post',
+      handler(html) {
+        if (!enabled) return html
+        const favicons = /\n {4}<link rel="icon"[^\n]*\n {4}<link rel="icon"[^\n]*/
+        if (!favicons.test(html)) throw new Error('vite: index.html lost its favicon pair')
+        return html.replace(favicons, `\n    ${HARNESSIE_HEAD}`)
+      },
+    },
+    async writeBundle() {
+      if (!enabled) return
+      await cp(resolve(brand, 'icons'), resolve(outputDirectory, 'harnessie/icons'), { recursive: true })
+      await cp(resolve(brand, 'manifest.webmanifest'), resolve(outputDirectory, 'manifest.webmanifest'))
+      await cp(resolve(brand, 'sw.js'), resolve(outputDirectory, 'sw.js'))
     },
   }
 }
@@ -170,7 +221,7 @@ export default defineConfig({
   // directory, and the served index resolves identically from the site root.
   base: './',
   plugins: [
-    rejectStandaloneServe(), clientDocumentTitle(), brandFontLicense(), react(), emitPreviewPage(),
+    rejectStandaloneServe(), clientDocumentTitle(), harnessieDocument(), brandFontLicense(), react(), emitPreviewPage(),
     productWebBundleIsolation(src('../..'), src('.')),
   ],
   build: {

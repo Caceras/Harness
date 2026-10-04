@@ -1,0 +1,34 @@
+.mark {
+  display: block;
+  object-fit: contain;
+  user-select: none;
+}
+
+.name {
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 24px;
+  letter-spacing: 0.01em;
+  color: var(--dsw-alias-label-primary);
+  white-space: nowrap;
+}
+
+.hero {
+  display: block;
+  object-fit: contain;
+  user-select: none;
+  transform-origin: 50% 100%;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .hero:hover {
+    animation: hop 0.9s ease-in-out infinite;
+  }
+}
+
+/* A small hop: lift, squash on landing, settle. */
+@keyframes hop {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  35% { transform: translateY(-6px) scale(0.97, 1.03); }
+  70% { transform: translateY(0) scale(1.04, 0.96); }
+}

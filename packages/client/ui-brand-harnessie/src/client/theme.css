@@ -1,0 +1,20 @@
+/*
+ * Harnessie palette: the brand scale every info, link, focus, and bubble alias
+ * reads, retuned from blue to the mascot's cyan and teal. `html body` outranks
+ * the theme's own `body` rules regardless of stylesheet order.
+ */
+html body,
+html body[data-ds-dark-theme] {
+  --dsw-static-deepseek-50: rgb(236, 251, 254);
+  --dsw-static-deepseek-100: rgb(207, 244, 251);
+  --dsw-static-deepseek-200: rgb(168, 233, 245);
+  --dsw-static-deepseek-300: rgb(112, 216, 236);
+  --dsw-static-deepseek-400: rgb(41, 196, 224);
+  --dsw-static-deepseek-450: rgb(24, 172, 203);
+  --dsw-static-deepseek-500: rgb(14, 128, 156);
+  --dsw-static-deepseek-600: rgb(20, 110, 136);
+  --dsw-static-deepseek-700-delete: rgb(18, 88, 110);
+  --dsw-static-deepseek-800: rgb(24, 64, 78);
+  --dsw-static-deepseek-900: rgb(22, 46, 55);
+  --dsw-alias-onboarding-accent: rgb(14, 128, 156);
+}
