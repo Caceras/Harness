@@ -20,10 +20,12 @@
     surfaceContext: false
     trustedHosts: !!js ctx.webStartup.trustedHosts
 
-# An installed phone app keeps its sign-in for a year instead of 30 days.
+# An installed phone app keeps its sign-in for a year instead of 30 days, and
+# Lax lets the login link sign in when it is opened from a chat or mail app.
 - id: connection
   config:
     cookieMaxAgeDays: 365
+    cookieSameSite: Lax
     trustedHosts: !!js ctx.webRuntime.trustedHosts
 
 # The container has no display, so folders are chosen with the in-browser picker.

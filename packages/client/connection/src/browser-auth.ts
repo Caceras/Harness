@@ -118,8 +118,10 @@ function cookieValue(headerValue: string, name: string): string | undefined {
 }
 
 /** Serialize the fixed browser-session attributes; generated names and values are cookie-safe base64url. */
-function sessionCookie(name: string, value: string, expiresAt: number, maxAgeSeconds: number): string {
-  return `${name}=${value}; Max-Age=${String(maxAgeSeconds)}; Path=/; Expires=${new Date(expiresAt).toUTCString()}; HttpOnly; SameSite=Strict`
+function sessionCookie(
+  name: string, value: string, expiresAt: number, maxAgeSeconds: number, sameSite: CookieSameSite,
+): string {
+  return `${name}=${value}; Max-Age=${String(maxAgeSeconds)}; Path=/; Expires=${new Date(expiresAt).toUTCString()}; HttpOnly; SameSite=${sameSite}`
 }
 
 function signature(secret: Buffer, body: string): Buffer {
@@ -177,6 +179,9 @@ async function initializeSecret(credentials: CredentialProvider): Promise<Buffer
   return secret
 }
 
+/** Browser-session cookie `SameSite` attribute values Connection accepts. */
+export type CookieSameSite = 'Strict' | 'Lax'
+
 /**
  * Process launch-token exchange and persistent signed-cookie verification.
  * Connection loads the credential provider's signing secret during activation
@@ -190,6 +195,7 @@ export class BrowserAuth {
     processOwner: object,
     private readonly secret: Buffer,
     maxAgeDays: number,
+    private readonly sameSite: CookieSameSite,
   ) {
     this.launchToken = processLaunchToken(processOwner)
     this.maxAgeMilliseconds = maxAgeDays * DAY_MILLISECONDS
@@ -205,14 +211,16 @@ export class BrowserAuth {
    * @param processOwner - root application context retaining one token across Connection reloads.
    * @param credentials - persistent credential provider for the Web profile.
    * @param maxAgeDays - positive absolute browser-cookie lifetime in days.
+   * @param sameSite - `SameSite` attribute of minted browser-session cookies.
    * @returns initialized authentication owner with the process owner's launch token.
    */
   static async create(
     processOwner: object,
     credentials: CredentialProvider,
     maxAgeDays: number,
+    sameSite: CookieSameSite = 'Strict',
   ): Promise<BrowserAuth> {
-    return new BrowserAuth(processOwner, await initializeSecret(credentials), maxAgeDays)
+    return new BrowserAuth(processOwner, await initializeSecret(credentials), maxAgeDays, sameSite)
   }
 
   /**
@@ -256,7 +264,7 @@ export class BrowserAuth {
           'location': './',
           'referrer-policy': 'no-referrer',
           'set-cookie': sessionCookie(
-            cookieName(authority), value, expiresAt, Math.floor(this.maxAgeMilliseconds / 1000),
+            cookieName(authority), value, expiresAt, Math.floor(this.maxAgeMilliseconds / 1000), this.sameSite,
           ),
         })
         res.end()

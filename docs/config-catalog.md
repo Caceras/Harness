@@ -455,6 +455,12 @@ export interface ConnectionConfig {
   trustedHosts?: string[]
   /** Absolute browser-session lifetime in days. Default: 30. */
   cookieMaxAgeDays?: number
+  /**
+   * Browser-session cookie `SameSite` attribute. Default: `Strict`. `Lax` lets
+   * a launch link opened from another app or site complete sign-in, because
+   * the token exchange's same-origin redirect then carries the new cookie.
+   */
+  cookieSameSite?: 'Strict' | 'Lax'
   /** Maximum buffered JSON body for every `/api` request. Default: 300 MiB. */
   maxRequestBodyBytes?: number
 }
