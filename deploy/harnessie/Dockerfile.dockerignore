@@ -1,0 +1,11 @@
+# Build inputs only: dependencies and every build output are produced inside the image.
+**/node_modules
+**/lib
+**/dist
+.git
+.dsh-build
+.release
+**/*.tsbuildinfo
+**/.turbo
+**/coverage
+website/.vitepress/cache

@@ -1,0 +1,39 @@
+# Harnessie on Dokploy: compose path ./deploy/harnessie/docker-compose.yml.
+# Dokploy attaches the harnessie.online domain (HTTPS, port 3000) to this
+# service; the labels below only redirect www.harnessie.online to it, because
+# browser sign-in cookies are bound to the one trusted host.
+services:
+  harnessie:
+    build:
+      context: ../..
+      dockerfile: deploy/harnessie/Dockerfile
+    restart: unless-stopped
+    volumes:
+      - harnessie-data:/data
+      - harnessie-workspace:/workspace
+    networks:
+      - dokploy-network
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+      - traefik.http.services.harnessie-www.loadbalancer.server.port=3000
+      - traefik.http.middlewares.harnessie-www-redirect.redirectregex.regex=^https?://www\.harnessie\.online/(.*)
+      - traefik.http.middlewares.harnessie-www-redirect.redirectregex.replacement=https://harnessie.online/$${1}
+      - traefik.http.middlewares.harnessie-www-redirect.redirectregex.permanent=true
+      - traefik.http.routers.harnessie-www-web.rule=Host(`www.harnessie.online`)
+      - traefik.http.routers.harnessie-www-web.entrypoints=web
+      - traefik.http.routers.harnessie-www-web.middlewares=harnessie-www-redirect
+      - traefik.http.routers.harnessie-www-web.service=harnessie-www
+      - traefik.http.routers.harnessie-www.rule=Host(`www.harnessie.online`)
+      - traefik.http.routers.harnessie-www.entrypoints=websecure
+      - traefik.http.routers.harnessie-www.tls.certresolver=letsencrypt
+      - traefik.http.routers.harnessie-www.middlewares=harnessie-www-redirect
+      - traefik.http.routers.harnessie-www.service=harnessie-www
+
+volumes:
+  harnessie-data:
+  harnessie-workspace:
+
+networks:
+  dokploy-network:
+    external: true

@@ -1,0 +1,36 @@
+# Harnessie deployment overlay, applied with `dsh web --patch`. A patch row
+# replaces the targeted row's whole config, so each row restates the keys it
+# keeps from packages/bundle/web-app/cordis.patch.yml.
+
+# Product identity: the model introduces itself as Harnessie.
+- id: system-prompt
+  config:
+    harnessIdentity: You are Harnessie, an AI agent.
+    personaSuffix: Your working directory is {{cwd}}.
+    personaPrefix: >-
+      You are a coding agent powered by the {{model}} model.
+
+# A hosted deployment has no source checkout for the model to extend and no
+# rebuild watcher, so the developer-facing Web-surface and source sections stay out.
+- id: web-runtime
+  config:
+    openBrowser: !!js ctx.webStartup.openBrowser
+    printUrl: true
+    publicUrl: !!js ctx.webStartup.publicUrl
+    surfaceContext: false
+    trustedHosts: !!js ctx.webStartup.trustedHosts
+
+# An installed phone app keeps its sign-in for a year instead of 30 days.
+- id: connection
+  config:
+    cookieMaxAgeDays: 365
+    trustedHosts: !!js ctx.webRuntime.trustedHosts
+
+# The container has no display, so folders are chosen with the in-browser picker.
+- id: directory-picker
+  disabled: true
+- insert:
+    - id: directory-picker-browse
+      name: '@deepseek-ai/dsh-host-directory-picker-browse'
+    - id: ui-directory-picker-browse
+      name: '@deepseek-ai/dsh-client-ui-directory-picker-browse'
