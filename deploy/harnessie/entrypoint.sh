@@ -16,9 +16,11 @@ mkdir -p "$DSH_HOME"
   done
 ) &
 
-exec node /app/apps/cli/lib/bin.js web \
+# Launcher flags (--profile, --patch) come first; the web app parses the rest.
+exec node /app/apps/cli/lib/bin.js \
+  --profile web \
+  --patch /app/deploy/harnessie/cordis.overlay.yml \
   --no-open \
   --port "$INTERNAL_PORT" \
   --public-url "$HARNESSIE_PUBLIC_URL" \
-  --trusted-host "$HARNESSIE_TRUSTED_HOST" \
-  --patch /app/deploy/harnessie/cordis.overlay.yml
+  --trusted-host "$HARNESSIE_TRUSTED_HOST"
