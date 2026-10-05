@@ -28,6 +28,11 @@
     cookieSameSite: Lax
     trustedHosts: !!js ctx.webRuntime.trustedHosts
 
+# The DeepSeek Harness preview notice would greet every page load of a remote browser.
+- id: ui-settings-models
+  config:
+    welcomeNotice: false
+
 # The container has no display, so folders are chosen with the in-browser picker.
 - id: directory-picker
   disabled: true
