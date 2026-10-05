@@ -1,5 +1,5 @@
 import type { PropsLocale } from '@deepseek-ai/dsh-client-ui-slots'
-import type { HeroBrandMarkOwnerProps } from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type { HeroBrandMarkOwnerProps, HeroHeadlineOwnerProps } from '@deepseek-ai/dsh-client-ui-conversation/client'
 import type { SidebarBrandMarkOwnerProps, SidebarBrandNameOwnerProps } from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import mascot from './assets/harnessie-mascot.png'
 import type { NS } from './locales.ts'
@@ -41,4 +41,13 @@ export function HarnessieHeroMark({ size, className }: HeroBrandMarkOwnerProps) 
     alt=""
     draggable={false}
   />
+}
+
+/**
+ * Render the empty-conversation headline in the host's title layout.
+ * @param props - host layout class and framework-injected translation seat.
+ * @returns the headline text without the default preview badge.
+ */
+export function HarnessieHeadline({ className, t }: HeroHeadlineOwnerProps & PropsLocale<typeof NS>) {
+  return <span className={className}><span>{t('headline')}</span></span>
 }

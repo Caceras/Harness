@@ -55,7 +55,8 @@ const HARNESSIE_HEAD = [
   '<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#151517" />',
   '<meta name="mobile-web-app-capable" content="yes" />',
   '<meta name="apple-mobile-web-app-capable" content="yes" />',
-  '<script>if (\'serviceWorker\' in navigator) addEventListener(\'load\', () => { void navigator.serviceWorker.register(\'./sw.js\') })</script>',
+  // The install offer can arrive before the client plugins load; keep it for the sidebar Install action.
+  '<script>addEventListener(\'beforeinstallprompt\', (event) => { event.preventDefault(); window.__harnessieInstallPrompt = event }, { once: true }); if (\'serviceWorker\' in navigator) addEventListener(\'load\', () => { void navigator.serviceWorker.register(\'./sw.js\') })</script>',
 ].join('\n    ')
 
 /**
