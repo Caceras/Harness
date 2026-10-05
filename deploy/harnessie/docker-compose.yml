@@ -1,0 +1,48 @@
+# Harnessie on Dokploy: compose path ./deploy/harnessie/docker-compose.yml.
+# Dokploy attaches the harnessie.online domain (HTTPS, port 3000) to this
+# service; the labels below only redirect www.harnessie.online to it, because
+# browser sign-in cookies are bound to the one trusted host.
+services:
+  harnessie:
+    build:
+      context: ../..
+      dockerfile: deploy/harnessie/Dockerfile
+    restart: unless-stopped
+    # Provider keys come from the Dokploy compose environment, never from the
+    # repository. Unset keys stay empty: requests on that route then fail with
+    # MISSING_CREDENTIAL, and keys saved on the Models page still apply.
+    environment:
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+    # /home/node holds folders made through the in-browser picker's Home root.
+    volumes:
+      - harnessie-data:/data
+      - harnessie-home:/home/node
+      - harnessie-workspace:/workspace
+    networks:
+      - dokploy-network
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+      - traefik.http.services.harnessie-www.loadbalancer.server.port=3000
+      - traefik.http.middlewares.harnessie-www-redirect.redirectregex.regex=^https?://www\.harnessie\.online/(.*)
+      - traefik.http.middlewares.harnessie-www-redirect.redirectregex.replacement=https://harnessie.online/$${1}
+      - traefik.http.middlewares.harnessie-www-redirect.redirectregex.permanent=true
+      - traefik.http.routers.harnessie-www-web.rule=Host(`www.harnessie.online`)
+      - traefik.http.routers.harnessie-www-web.entrypoints=web
+      - traefik.http.routers.harnessie-www-web.middlewares=harnessie-www-redirect
+      - traefik.http.routers.harnessie-www-web.service=harnessie-www
+      - traefik.http.routers.harnessie-www.rule=Host(`www.harnessie.online`)
+      - traefik.http.routers.harnessie-www.entrypoints=websecure
+      - traefik.http.routers.harnessie-www.tls.certresolver=letsencrypt
+      - traefik.http.routers.harnessie-www.middlewares=harnessie-www-redirect
+      - traefik.http.routers.harnessie-www.service=harnessie-www
+
+volumes:
+  harnessie-data:
+  harnessie-home:
+  harnessie-workspace:
+
+networks:
+  dokploy-network:
+    external: true

@@ -46,6 +46,7 @@ const MIME: Record<string, string> = {
   '.json': 'application/json',
   '.map': 'application/json',
   '.webmanifest': 'application/manifest+json',
+  '.png': 'image/png',
   // The packed VFS image. Served as its own bytes, never as a Content-Encoding:
   // the worker inflates the body itself, and a transport-level encoding would
   // leave it inflating an already-decoded archive.

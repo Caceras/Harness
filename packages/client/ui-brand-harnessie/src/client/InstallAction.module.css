@@ -1,0 +1,41 @@
+.root {
+  display: flex;
+}
+
+/* Matches the Settings trigger geometry below it in both sidebar widths. */
+.rail,
+.wide {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  border: none;
+  border-radius: var(--dsw-radius-md);
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+  cursor: pointer;
+}
+
+.rail {
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+}
+
+.wide {
+  flex: 1;
+  gap: 8px;
+  height: 42px;
+  padding: 0 10px 0 8px;
+  font: inherit;
+}
+
+.rail:hover,
+.wide:hover {
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.label {
+  overflow: hidden;
+  white-space: nowrap;
+}

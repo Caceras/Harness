@@ -252,6 +252,16 @@ describe('connection node half', () => {
     expect(upgrades).toHaveLength(0)
   })
 
+  it('mints SameSite=Lax session cookies when configured, so launches from another app sign in', async () => {
+    const { connection, dispose } = await mounted({ trustedHosts: ['harness.example'], cookieSameSite: 'Lax' })
+    const url = new URL(connection.authenticatedUrl('https://harness.example'))
+    const exchanged = fakeResponse()
+    connection.authorizeIndex(fakeRequest({ host: 'harness.example' }, `${url.pathname}${url.search}`), exchanged.response)
+    expect(exchanged.state.status).toBe(303)
+    expect(exchanged.state.headers?.['set-cookie']).toMatch(/; HttpOnly; SameSite=Lax$/u)
+    await dispose()
+  })
+
   it('registers only the HTTP route and removes it with the fiber', async () => {
     const { routes, upgrades, dispose } = await mounted()
     expect(routes).toHaveLength(1)

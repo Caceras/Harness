@@ -243,10 +243,15 @@ function compareToolNames(a: ToolSchema, b: ToolSchema): number {
   return compareNames(a.name, b.name)
 }
 
+/** Default identity opener rendered at order −1000. */
+const HARNESS_IDENTITY = 'You are an AI agent powered by DeepSeek Harness.'
+
 /** Plugin config: the deployment-authored fragment of the system prompt (see {@link Config.personaPrefix} for its contract). */
 export interface Config {
-  /** Include the fixed DeepSeek Harness identity before the deployment persona (default true). */
+  /** Include the fixed harness identity before the deployment persona (default true). */
   includeHarnessIdentity?: boolean
+  /** Literal text of that identity opener; a rebranded deployment names its own product here. */
+  harnessIdentity?: string
   /** Include dynamic runtime-context snapshots in model history (default true). */
   includeRuntimeContext?: boolean
   /**
@@ -405,6 +410,7 @@ class PromptLayer implements ScopeLayer {
 export class SystemPrompt extends Service {
   static Config: z<Config> = z.object({
     includeHarnessIdentity: z.boolean().default(true),
+    harnessIdentity: z.string().min(1).default(HARNESS_IDENTITY),
     includeRuntimeContext: z.boolean().default(true),
     personaPrefix: z.string().default(''),
     personaSuffix: z.string().default(''),
@@ -426,7 +432,8 @@ export class SystemPrompt extends Service {
       this.section({
         name: 'harness:identity',
         order: this.getSectionOrder('HARNESS_IDENTITY'),
-        text: 'You are an AI agent powered by DeepSeek Harness.',
+        // The fallback narrows the optional input type; the schema already defaults it.
+        text: config.harnessIdentity ?? HARNESS_IDENTITY,
       })
     }
     this.section({

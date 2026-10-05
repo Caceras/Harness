@@ -1,0 +1,67 @@
+# Harnessie deployment overlay, applied with `dsh web --patch`. A patch row
+# replaces the targeted row's whole config, so each row restates the keys it
+# keeps from packages/bundle/web-app/cordis.patch.yml.
+
+# Product identity: the model introduces itself as Harnessie.
+- id: system-prompt
+  config:
+    harnessIdentity: You are Harnessie, an AI agent.
+    personaSuffix: Your working directory is {{cwd}}.
+    personaPrefix: >-
+      You are a coding agent powered by the {{model}} model.
+
+# A hosted deployment has no source checkout for the model to extend and no
+# rebuild watcher, so the developer-facing Web-surface and source sections stay out.
+- id: web-runtime
+  config:
+    openBrowser: !!js ctx.webStartup.openBrowser
+    printUrl: true
+    publicUrl: !!js ctx.webStartup.publicUrl
+    surfaceContext: false
+    trustedHosts: !!js ctx.webStartup.trustedHosts
+
+# An installed phone app keeps its sign-in for a year instead of 30 days, and
+# Lax lets the login link sign in when it is opened from a chat or mail app.
+- id: connection
+  config:
+    cookieMaxAgeDays: 365
+    cookieSameSite: Lax
+    trustedHosts: !!js ctx.webRuntime.trustedHosts
+
+# The DeepSeek Harness preview notice would greet every page load of a remote browser.
+- id: ui-settings-models
+  config:
+    welcomeNotice: false
+
+# The container has no Documents folder; the first-use workspace goes on the
+# persistent /workspace volume instead of the image's home directory.
+- id: workspace-controller
+  config:
+    documentsDirectory: /workspace
+
+# The container has no display, so folders are chosen with the in-browser picker.
+- id: directory-picker
+  disabled: true
+- insert:
+    - id: directory-picker-browse
+      name: '@deepseek-ai/dsh-host-directory-picker-browse'
+    - id: ui-directory-picker-browse
+      name: '@deepseek-ai/dsh-client-ui-directory-picker-browse'
+
+# OpenRouter as a second provider, keyed by OPENROUTER_API_KEY from the
+# container environment. The list keeps the model picker short; DeepSeek stays
+# the default route.
+- id: llm-pi-ai
+  config:
+    providers:
+      openrouter:
+        displayName: OpenRouter
+        apiKeyEnv: OPENROUTER_API_KEY
+        models:
+          - id: anthropic/claude-sonnet-5
+          - id: anthropic/claude-opus-5.5
+          - id: openai/gpt-5.5
+          - id: google/gemini-3.8-flash
+          - id: moonshotai/kimi-k3
+          - id: z-ai/glm-5.3
+          - id: qwen/qwen3.8-27b:free

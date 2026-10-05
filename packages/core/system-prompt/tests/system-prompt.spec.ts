@@ -122,6 +122,18 @@ describe('SystemPrompt', () => {
       expect(renderPrompt(await ctx.systemPrompt.assemble())).toBe(IDENTITY)
     })
 
+    it('renders a rebranded deployment\'s identity opener in the fixed identity position', async () => {
+      const ctx = new Context()
+      await ctx.plugin(SystemPrompt, {
+        harnessIdentity: 'You are Harnessie, an AI agent.',
+        personaPrefix: 'You are a coding agent.',
+      })
+
+      const assembly = await ctx.systemPrompt.assemble()
+      expect(assembly.sections.map(section => section.name)[0]).toBe('harness:identity')
+      expect(renderPrompt(assembly)).toBe('You are Harnessie, an AI agent.\n\nYou are a coding agent.')
+    })
+
     it('can omit the harness identity for a deployment that owns the complete persona', async () => {
       const ctx = new Context()
       await ctx.plugin(SystemPrompt, {
