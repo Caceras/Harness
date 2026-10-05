@@ -14,8 +14,10 @@ services:
     environment:
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+    # /home/node holds folders made through the in-browser picker's Home root.
     volumes:
       - harnessie-data:/data
+      - harnessie-home:/home/node
       - harnessie-workspace:/workspace
     networks:
       - dokploy-network
@@ -38,6 +40,7 @@ services:
 
 volumes:
   harnessie-data:
+  harnessie-home:
   harnessie-workspace:
 
 networks:

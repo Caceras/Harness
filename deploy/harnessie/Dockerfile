@@ -31,13 +31,14 @@ RUN DSH_CLIENT_BUILD_PROFILE=harnessie DSH_CLIENT_TITLE=Harnessie \
   DSH_CLIENT_COMMIT_HASH=${DSH_CLIENT_COMMIT_HASH} pnpm run build
 
 # DSH_HOME keeps credentials, settings, sessions, and the browser-cookie
-# signing secret; /workspace is the agent's default working directory.
+# signing secret; /workspace is the agent's default working directory; the
+# home directory keeps folders created from the directory picker's Home root.
 ENV DSH_HOME=/data/dsh \
   NPM_CONFIG_PREFIX=/home/node/.npm-global \
   PATH=/home/node/.npm-global/bin:/home/node/.local/bin:$PATH \
   HARNESSIE_PUBLIC_URL=https://harnessie.online/ \
   HARNESSIE_TRUSTED_HOST=harnessie.online
-VOLUME ["/data", "/workspace"]
+VOLUME ["/data", "/home/node", "/workspace"]
 WORKDIR /workspace
 EXPOSE 3000
 
