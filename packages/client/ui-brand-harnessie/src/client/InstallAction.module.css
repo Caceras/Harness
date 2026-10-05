@@ -1,5 +1,4 @@
 .root {
-  position: relative;
   display: flex;
 }
 
@@ -39,35 +38,4 @@
 .label {
   overflow: hidden;
   white-space: nowrap;
-}
-
-.help {
-  position: absolute;
-  bottom: 0;
-  left: calc(100% + 8px);
-  z-index: 1000;
-  width: 220px;
-  padding: 12px;
-  border-radius: var(--dsw-radius-md);
-  background: var(--dsw-alias-bg-layer-1);
-  box-shadow: 0 4px 16px rgb(0 0 0 / 16%);
-  color: var(--dsw-alias-label-primary);
-}
-
-.helpText {
-  margin: 0 0 8px;
-  font-size: 13px;
-  line-height: 18px;
-}
-
-.helpClose {
-  padding: 4px 10px;
-  border: none;
-  border-radius: var(--dsw-radius-md);
-  background: var(--dsw-alias-button-info-fill);
-  /* Static white on the info fill in both themes, like the composer's send button. */
-  color: #fff;
-  font: inherit;
-  font-size: 13px;
-  cursor: pointer;
 }

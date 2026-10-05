@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { IconDownloadOutlineMedium, Tooltip } from '@deepseek-ai/dsh-client-ui-primitives'
+import { Button, IconDownloadOutlineMedium, Modal, Tooltip } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { InjectFace, PropsLocale } from '@deepseek-ai/dsh-client-ui-slots'
 import type { SidebarFooterActionOwnerProps } from '@deepseek-ai/dsh-client-ui-sidebar/client'
 import type { InstallPromptStore } from './install.ts'
@@ -42,17 +42,18 @@ export function HarnessieInstallAction({ wide, t, useInstallState, install }: In
       {wide && <span className={css.label}>{label}</span>}
     </button>
   )
+  const closeHelp = () => { setHelpOpen(false) }
   return (
     <div className={css.root}>
       {wide ? button : <Tooltip label={label}>{button}</Tooltip>}
-      {helpOpen && (
-        <div className={css.help} role="dialog" aria-label={label}>
-          <p className={css.helpText}>{t('install.help')}</p>
-          <button type="button" className={css.helpClose} onClick={() => { setHelpOpen(false) }}>
-            {t('install.close')}
-          </button>
-        </div>
-      )}
+      <Modal
+        open={helpOpen}
+        onClose={closeHelp}
+        title={label}
+        closeLabel={t('install.dismiss')}
+        description={t('install.help')}
+        footer={<Button variant="primary" onClick={closeHelp}>{t('install.close')}</Button>}
+      />
     </div>
   )
 }

@@ -204,8 +204,12 @@ describe('Harnessie install action', () => {
     const view = render(<HarnessieInstallAction {...props({ installed: false, promptable: false }, () => Promise.resolve(false), false)} />)
     expect(view.queryByText('Install app')).toBeNull()
     await act(async () => { fireEvent.click(view.getByRole('button', { name: 'Install app' })) })
-    expect(view.getByRole('dialog').textContent).toContain(en['install.help'])
+    expect(view.getByRole('dialog', { name: 'Install app' }).textContent).toContain(en['install.help'])
     fireEvent.click(view.getByRole('button', { name: en['install.close'] }))
+    expect(view.queryByRole('dialog')).toBeNull()
+
+    await act(async () => { fireEvent.click(view.getByRole('button', { name: 'Install app' })) })
+    fireEvent.click(view.getByRole('button', { name: en['install.dismiss'] }))
     expect(view.queryByRole('dialog')).toBeNull()
   })
 })
