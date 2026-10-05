@@ -33,6 +33,12 @@
   config:
     welcomeNotice: false
 
+# The container has no Documents folder; the first-use workspace goes on the
+# persistent /workspace volume instead of the image's home directory.
+- id: workspace-controller
+  config:
+    documentsDirectory: /workspace
+
 # The container has no display, so folders are chosen with the in-browser picker.
 - id: directory-picker
   disabled: true
