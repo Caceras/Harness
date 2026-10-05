@@ -36,3 +36,21 @@
       name: '@deepseek-ai/dsh-host-directory-picker-browse'
     - id: ui-directory-picker-browse
       name: '@deepseek-ai/dsh-client-ui-directory-picker-browse'
+
+# OpenRouter as a second provider, keyed by OPENROUTER_API_KEY from the
+# container environment. The list keeps the model picker short; DeepSeek stays
+# the default route.
+- id: llm-pi-ai
+  config:
+    providers:
+      openrouter:
+        displayName: OpenRouter
+        apiKeyEnv: OPENROUTER_API_KEY
+        models:
+          - id: anthropic/claude-sonnet-5
+          - id: anthropic/claude-opus-5.5
+          - id: openai/gpt-5.5
+          - id: google/gemini-3.8-flash
+          - id: moonshotai/kimi-k3
+          - id: z-ai/glm-5.3
+          - id: qwen/qwen3.8-27b:free

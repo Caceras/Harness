@@ -8,6 +8,12 @@ services:
       context: ../..
       dockerfile: deploy/harnessie/Dockerfile
     restart: unless-stopped
+    # Provider keys come from the Dokploy compose environment, never from the
+    # repository. Unset keys stay empty: requests on that route then fail with
+    # MISSING_CREDENTIAL, and keys saved on the Models page still apply.
+    environment:
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
     volumes:
       - harnessie-data:/data
       - harnessie-workspace:/workspace
